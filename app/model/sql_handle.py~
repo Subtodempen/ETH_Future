@@ -1,0 +1,25 @@
+from sqlmodel import Field, SQLModel
+
+
+class User(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    Balance: int
+    PendingBalance: int
+    
+class Order(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    UserId: int = Field(index=True)
+    Price: int
+    FuturePrice: int
+    TimePlaced: str
+    Expeiry: str
+    Status: str
+
+class TransactionTable(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    txHash: str
+    FromAddress: str
+    ToAddress: str
+    Value: int
+    Status: str
+
