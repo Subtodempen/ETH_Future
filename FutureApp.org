@@ -1,0 +1,51 @@
+* Future Trading App
+
+** Architecture
+Frontend is just Javascript, html and CSS using the fetch function.
+
+The backend is just PostgreSQL and web3.py for payements. Tables will
+be 2NF normalized. 
+
+*** Backend Architecture
+All Tables have a thread worker constalling polling and updating them, if
+an order is no longer pending ethereum has to be sent or sold.
+
+**** Top Up Requests
+Creates a new Transaction database Tuple keeps it at pending. (Checked with sql) 
+When alchemy gets enough on chain confirmations the databse is changed to Not pending and the amount
+is usable to the user. User has a one to many relationship with transactions.
+
+#+begin_src python
+  @app.get("/transfer")
+  async def start_eth_transfer():
+      # Generate a web3 address
+      # Create a new sql tuple with the hash transaction etc and pending status
+#+end_src
+When the pending is finalized then the associated user gets the money on there account and
+transaction is set to Finalized. The key will be held with an envirement key.
+
+**** Buy Future Request
+When the user attempts to buy a future the user's account balance is checked. 
+if amount <= futurePrice then the order can be placed and the database will
+be updated with the new future request.  
+
+| OrderId | UserId | Price | Future Price | TimePlaced | Expiery  | Status  |
+|---------+--------+-------+--------------+------------+----------+---------|
+|    1232 |   3211 |  1000 |         1030 | 15/01/27   | 22/01/26 | PENDING |
+|---------+--------+-------+--------------+------------+----------+---------|
+
+#+begin_src python
+  @app.get("/purchase")
+  async def make_future_purchase():
+      # Check the users account balance
+      # Get Future price
+      # Update the order tuple into the DB
+      # Subtract money from the user 
+#+end_src
+
+**** Fufil Future
+If the current Date is seen to be after or equal to the expiery date the etherum can be sent
+to the user and the Status can be fuffiled. A worker thread is constantly polling it.
+
+
+
