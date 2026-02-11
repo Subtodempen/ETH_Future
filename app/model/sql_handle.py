@@ -17,11 +17,11 @@ class Order(SQLModel, table=True):
 
 class Transaction(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    UserId: int = Field(index=true)
+    UserId: int = Field(index=True)
     txHash: str | None = Field(default = None)
+    TimeStamp: datetime
     FromAddress: str
     ToAddress: str
-    TimeStamp: datetime.datetime
     Amount: int
     Status: str
 

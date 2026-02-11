@@ -49,3 +49,6 @@ to the user and the Status can be fuffiled. A worker thread is constantly pollin
 
 
 
+** Crypto Handling
+The class has an interface can generate public keys takes in the private keys.
+It needs to be ablle to verify transactions, 
