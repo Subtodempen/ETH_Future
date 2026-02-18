@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from datetime import datetime
 
-from model.sql_handle import init_db_tables
+from dotenv import load_dotenv 
+
+from model.sql_handle import *
 from crypto.eth import CryptoHandle
 
 class EthTransferInfo(BaseModel):
@@ -14,13 +16,12 @@ class EthTransferInfo(BaseModel):
 app = FastAPI()
 crypto = CryptoHandle()
 
-load_dotenv()
 
 @app.on_event("startup")
 def on_startup():
     init_db_tables()
+    load_dotenv()
     crypto.set_private_key()
-    
 
 # constrcuts a pending status
 # A worker thread will poll it noticing when money is recieved
