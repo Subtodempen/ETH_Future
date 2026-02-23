@@ -1,33 +1,57 @@
-from sqlmodel import Field, SQLModel, create_engine
+from sqlmodel import Field, SQLModel, create_engine, Session, select
 from datetime import datetime
 
-class User(SQLModel, table=True):
+class Users(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    Balance: int
-    PendingBalance: int
+    username: str = Field(unique=True)
+    password_hash: str
+    balance: int = Field(default=0)
+    pending_balance: int = Field(default=0)
     
 class Order(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    UserId: int = Field(index=True)
-    Price: int
-    FuturePrice: int
-    TimePlaced: str
-    Expeiry: str
-    Status: str
+    user_id: int = Field(index=True)
+    price: int
+    future_price: int
+    time_placed: str
+    expeiry: str
+    status: str
 
 class Transaction(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    UserId: int = Field(index=True)
-    txHash: str | None = Field(default = None)
-    TimeStamp: datetime
-    FromAddress: str
-    ToAddress: str
-    Amount: int
-    Status: str
+    user_id: int = Field(index=True)
+    tx_hash: str | None = Field(default = None)
+    time_stamp: datetime
+    from_address: str
+    to_address: str
+    amount: int
+    status: str
 
 
-postgres_url = "postgresql://postgres:root@localhost:5432/database"
-engine = create_engine(postgres_url, echo=True)
+class SqlHandle():
+    def __init__(self):
+        self.postgres_url = "postgresql://postgres:root@localhost:5432/database"
 
-def init_db_tables():
-    SQLModel.metadata.create_all(engine)
+    def start_DB(self):
+        self.engine = create_engine(self.postgres_url, echo=True)
+        self.session = Session(self.engine)
+
+    def init_db_tables(self):
+        SQLModel.metadata.create_all(self.engine)
+
+    def push_to_table(self, table_row):
+        self.session.add(table_row)
+
+    def commit(self):
+        self.session.commit()
+
+    def match_string(self, table, table_val, str):
+        statement = select(table).where(table_val == str)
+        obj = self.session.exec(statement).first()
+
+        if obj is None:
+            raise ValueError("No Object in db")
+
+        return obj
+    
+    
