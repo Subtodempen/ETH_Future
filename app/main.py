@@ -125,7 +125,7 @@ async def sign_up(new_user: UserSignUp):
         password_hash = password_hash
     )
 
-    sql.push_to_table(new_user_obj)
+    sql.push_to_table(new_user_obj) 
     sql.commit()
 
     return {}
