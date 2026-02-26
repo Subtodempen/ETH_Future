@@ -8,7 +8,7 @@ class CryptoHandle:
         self.bip44_chg_ctx = None
         self.bip44_mstr_ctx = None
 
-        self.generate_account_from_index()
+        self.construct_bip_acc()
         
     @classmethod
     def from_env(cls, index = 0):

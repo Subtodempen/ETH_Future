@@ -20,8 +20,10 @@ class UserSignUp(BaseModel):
     username: str = Field(nullable=False)
     password: str = Field(nullable=False)
 
+load_dotenv()
+    
 app = FastAPI()
-crypto = CryptoHandle()
+crypto = CryptoHandle.from_env()
 sql = SqlHandle()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -67,9 +69,6 @@ def on_startup():
     sql.start_DB()
     sql.init_db_tables()
 
-    load_dotenv()
-    crypto.set_private_key()
-
 @app.post("/token")
 async def log_in(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     # Get the user object
@@ -88,15 +87,17 @@ async def log_in(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
 @app.post("/transactions")
 async def createTransaction(eth_transfer: EthTransferInfo, curr_user: Annotated[Users, Depends(get_curr_user)]):
     transfer_dict = eth_transfer.model_dump()
-    # Generate to address
-    to_address = crypto.generate_address()
 
+    # Generate to address
+    index = crypto.get_bip44_index()
+    crypto.generate_new_address()
+    
     # Get the current User using OAUTH 
     trans = Transaction(
         user_id = curr_user.id,
         amount = transfer_dict["transfer_amount"],
         from_address = transfer_dict["from_address"],
-        to_address = to_address,
+        bip44_index = index,
         time_stamp = transfer_dict["time_stamp"],
         status = "Pending",
     )

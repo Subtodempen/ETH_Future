@@ -23,7 +23,7 @@ class Transaction(SQLModel, table=True):
     tx_hash: str | None = Field(default = None)
     time_stamp: datetime
     from_address: str
-    to_address: str
+    bip44_index: int
     amount: int
     status: str
 
