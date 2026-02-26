@@ -2,27 +2,22 @@ from bip_utils import Bip39MnemonicGenerator, Bip39SeedGenerator, Bip39WordsNum,
 import os
 
 class CryptoHandle:
-    def __init__(self, index = 0):
-        self.mnemonic = None
+    def __init__(self, mnemonic, index = 0):
+        self.mnemonic = mnemonic    
         self.index = index
-
         self.bip44_chg_ctx = None
         self.bip44_mstr_ctx = None
+
+        self.generate_account_from_index()
         
-    @property
-    def mnemonic(self):
-        if self._mnemonic is None:
-            raise ValueError("Private Key not found")
+    @classmethod
+    def from_env(cls, index = 0):
+        mnemonic = os.getenv("MNEMONIC")
 
-        return self._mnemonic
+        if not mnemonic:
+            raise ValueError("Could not load mnemonic from dotenv")
 
-    @mnemonic.setter
-    def mnemonic(self, value):
-        self._mnemonic = value
-
-    def set_mnemonic(self):
-        self.mnemonic = os.getenv("MNEMONIC")
-
+        return cls(mnemonic, index)
     
     def construct_bip_acc(self):
         # generate Seed from mnemonic
