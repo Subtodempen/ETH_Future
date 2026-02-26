@@ -1,0 +1,29 @@
+from sqlmodel import SQLModel, Field
+from datetime import datetime
+
+
+class Users(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    username: str = Field(unique=True)
+    password_hash: str
+    balance: int = Field(default=0)
+    pending_balance: int = Field(default=0)
+    
+class Order(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    user_id: int = Field(index=True)
+    price: int
+    future_price: int
+    time_placed: str
+    expeiry: str
+    status: str
+
+class Transaction(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    user_id: int = Field(index=True)
+    tx_hash: str | None = Field(default = None)
+    time_stamp: datetime
+    from_address: str
+    bip44_index: int
+    amount: int
+    status: str

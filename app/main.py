@@ -8,7 +8,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 import bcrypt
 
-from model.sql_handle import *
+from model.sql_handle import SqlHandle
+from model.model import *
+
 from crypto.eth import CryptoHandle
 
 class EthTransferInfo(BaseModel):
@@ -20,14 +22,7 @@ class UserSignUp(BaseModel):
     username: str = Field(nullable=False)
     password: str = Field(nullable=False)
 
-load_dotenv()
-    
-app = FastAPI()
-crypto = CryptoHandle.from_env()
-sql = SqlHandle()
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
 
 # Helper Function only to be run in post rquests
 def get_user_obj(username):
@@ -66,8 +61,13 @@ def get_curr_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
 @app.on_event("startup")
 def on_startup():
-    sql.start_DB()
-    sql.init_db_tables()
+    load_dotenv()
+    
+    app = FastAPI()
+    crypto = CryptoHandle.from_env()
+    sql = SqlHandle("postgresql://postgres:root@localhost:5432/database")
+
+    sql.set_db_tables()
 
 @app.post("/token")
 async def log_in(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
